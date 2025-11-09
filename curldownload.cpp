@@ -1,23 +1,21 @@
 #include "curldownload.h"
 
-using namespace std;
-
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 	size_t realsize = size * nmemb;
-	ofstream* file = static_cast<ofstream*>(userp);
+	std::ofstream* file = static_cast<std::ofstream*>(userp);
 	if (!file) return 0;
 
 	file->write(static_cast<char*>(contents), realsize);
 	return realsize;
 }
 
-bool file_exists(string name) {
-	return filesystem::exists(name);
+bool file_exists(std::string name) {
+	return std::filesystem::exists(name);
 }
 
-curl_off_t get_file_size(const string filename) {
+curl_off_t get_file_size(const std::string filename) {
 	try {
-		return filesystem::file_size(filename);
+		return std::filesystem::file_size(filename);
 	}
 	catch (...) {
 		return 0;
@@ -25,6 +23,8 @@ curl_off_t get_file_size(const string filename) {
 }
 
 static int ProgressCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+	std::stringstream LoggerLog;
+	Logger logger;
 	// 获取下载开始时间
 	static time_t start_time = time(0);
 	time_t now = time(0);
@@ -43,43 +43,54 @@ static int ProgressCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow,
 		double remaining = (dltotal - dlnow) / (speed * 1024.0); // 秒
 
 		// 进度显示
-		cout << "\r" << GetLogger(LOGINFO) << "Downloading: "
-			<< fixed << setprecision(2) << progress << "% "
+		std::cout << '\r';
+		LoggerLog << "Downloading: "
+			<< std::fixed << std::setprecision(2) << progress << "% "
 			<< "(" << (double)dlnow / 1024 / 1024 << "MB/"
 			<< (double)dltotal / 1024 / 1024 << "MB) "
-			<< "Speed: " << setprecision(2) << speed << "KB/s "
-			<< "ETA: " << static_cast<int>(remaining) << "s     " << flush;
+			<< "Speed: " << std::setprecision(2) << speed << "KB/s "
+			<< "ETA: " << static_cast<int>(remaining) << "s     " << std::flush;
+		logger.LogINFO(LoggerLog);
 	}
 	else {
 		// 未知总大小的情况
-		cout << "\r" << GetLogger(LOGINFO) << "Downloading: "
+		std::cout << '\r';
+		LoggerLog << "Downloading: "
 			<< (double)dlnow / 1024 / 1024 << "MB received "
-			<< "Speed: " << setprecision(2) << speed << "KB/s     " << flush;
+			<< "Speed: " << std::setprecision(2) << speed << "KB/s     " << std::flush;
+		logger.LogINFO(LoggerLog);
 	}
 
 	return 0;
 }
 
 
-int gDownload(string url, string filename, bool resume_mode) {
+int gDownload(std::string url, std::string filename, bool resume_mode) {
+	std::stringstream LoggerLog;
+	Logger logger;
+
 	curl_off_t resume_from = 0;
 
 	if (resume_mode && file_exists(filename)) {
 		resume_from = get_file_size(filename);
-		if (resume_from > 0) cout << GetLogger(LOGINFO) << "Resuming download from " << resume_from << " bytes." << endl;
+		if (resume_from > 0) {
+			LoggerLog << "Resuming download from " << resume_from << " bytes." << std::endl;
+			logger.LogINFO(LoggerLog);
+		}
 	}
 
 	CURL* curl;
 	CURLcode res;
 
 	// 打开输出文件
-	ios_base::openmode mode = ios::binary;
-	if (resume_mode && resume_from > 0) mode |= ios::app; // 追加模式
-	else mode |= ios::trunc; // 截断模式
-	ofstream output_file(filename, mode);
+	std::ios_base::openmode mode = std::ios::binary;
+	if (resume_mode && resume_from > 0) mode |= std::ios::app; // 追加模式
+	else mode |= std::ios::trunc; // 截断模式
+	std::ofstream output_file(filename, mode);
 
 	if (!output_file.is_open()) {
-		cerr << GetLogger(WARN) << "Error: Failed to open file " << filename << " for writing." << endl;
+		LoggerLog << "Error: Failed to open file " << filename << " for writing." << std::endl;
+		logger.LogERROR(LoggerLog);
 		return 1;
 	}
 
@@ -87,7 +98,8 @@ int gDownload(string url, string filename, bool resume_mode) {
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	curl = curl_easy_init();
 	if (!curl) {
-		cerr << GetLogger(WARN) << "Failed to initialize libcurl." << endl;
+		LoggerLog << "Failed to initialize libcurl." << std::endl;
+		logger.LogERROR(LoggerLog);
 		output_file.close();
 		return 1;
 	}
@@ -138,13 +150,15 @@ int gDownload(string url, string filename, bool resume_mode) {
 
 	// 检查结果
 	if (res != CURLE_OK) {
-		cerr << endl << GetLogger(WARN) << "Download failed: " << curl_easy_strerror(res) << endl;
+		LoggerLog << "Download failed: " << curl_easy_strerror(res) << std::endl;
+		logger.LogWARN(LoggerLog);
 
 		// 获取更多错误信息
 		if (res == CURLE_HTTP_RETURNED_ERROR) {
 			long response_code;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-			cerr << GetLogger(WARN) << "HTTP Error: " << response_code << endl;
+			LoggerLog << "HTTP Error: " << response_code << std::endl;
+			logger.LogERROR(LoggerLog);
 		}
 
 		// 清理
@@ -153,7 +167,8 @@ int gDownload(string url, string filename, bool resume_mode) {
 		// 删除不完整的文件（非续传模式）
 		if (!resume_mode) {
 			remove(filename.c_str());
-			cerr << GetLogger(WARN) << "Incomplete file deleted." << endl;
+			LoggerLog << "Incomplete file deleted." << std::endl;
+			logger.LogERROR(LoggerLog);
 		}
 
 		return 1;
@@ -176,16 +191,19 @@ int gDownload(string url, string filename, bool resume_mode) {
 	curl_easy_cleanup(curl);
 
 	// 最终输出
-	cout << endl << endl << GetLogger(LOGINFO) << "Download completed successfully!" << endl
-		<< "File: " << filename << endl
-		<< "Size: " << dl_size / 1024 << " KB (" << dl_size << " bytes)" << endl
-		<< "Time: " << fixed << setprecision(2) << total_time << " seconds" << endl
-		<< "Speed: " << speed / 1024 << " KB/s" << endl
-		<< "HTTP Status: " << response_code << endl;
+	std::cout << std::endl << std::endl;
+	LoggerLog << "Download completed successfully!" << std::endl
+		<< "File: " << filename << std::endl
+		<< "Size: " << dl_size / 1024 << " KB (" << dl_size << " bytes)" << std::endl
+		<< "Time: " << std::fixed << std::setprecision(2) << total_time << " seconds" << std::endl
+		<< "Speed: " << speed / 1024 << " KB/s" << std::endl
+		<< "HTTP Status: " << response_code << std::endl;
+	logger.LogINFO(LoggerLog);
 
 	// 清理资源
 	curl_global_cleanup();
 
-	cout << GetLogger(LOGINFO) << "File downloaded successfully: " << filename << endl;
+	LoggerLog << "File downloaded successfully: " << filename << std::endl;
+	logger.LogINFO(LoggerLog);
 	return 0;
 }

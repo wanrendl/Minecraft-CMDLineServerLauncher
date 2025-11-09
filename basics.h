@@ -14,10 +14,6 @@
 #define ARM64 2
 #define AMD64 1
 
-#define LOGINFO 0
-#define WARN 1
-#define EROR 2
-
 typedef struct _DEVICEINFO_ {
 	int CPU_architecture;
 	unsigned int CPU_core_num;
@@ -27,14 +23,7 @@ typedef struct _DEVICEINFO_ {
 	double MEMORY_available_gb;
 } DeviceInfo;
 
-static std::string utol(std::string str) {
-	for (int i = 0; i <= str.length(); i += 1)
-		if (str[i] <= 90 && str[i] >= 65)
-			str[i] += 32;
-	return str;
-}
-
-std::string GetLogger(int type = LOGINFO);
+std::string utol(std::string str);
 
 class _cDeviceInfo {
 public:
@@ -48,5 +37,16 @@ void basicSetup(std::string path, std::string core, std::string javapath);
 void argumentSetup(std::string path, int corenum);
 
 bool isDigitString(std::string str);
+static std::string GetLocalTime();
+
+class Logger {
+public:
+	void LogINFO(std::string& Log);
+	void LogINFO(std::stringstream& Log);
+	void LogWARN(std::string& Log);
+	void LogWARN(std::stringstream& Log);
+	void LogERROR(std::string& Log);
+	void LogERROR(std::stringstream& Log);
+};
 
 #endif

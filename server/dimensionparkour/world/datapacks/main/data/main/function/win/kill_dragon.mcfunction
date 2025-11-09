@@ -1,2 +1,0 @@
-execute at @e[type=ender_dragon,limit=1] run playsound minecraft:entity.ender_dragon.death master @a[tag=bossbattle] ~ ~ ~ 3 1 0
-data merge entity @e[type=minecraft:ender_dragon,limit=1] {DragonPhase:9}

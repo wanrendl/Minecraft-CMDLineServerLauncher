@@ -1,7 +1,7 @@
 #include "gjson.h"
 
-bool TestJson(string fileName) {
-	ifstream inJson(fileName, ios::binary);
+bool TestJson(std::string fileName) {
+	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
 		return false;
@@ -9,8 +9,8 @@ bool TestJson(string fileName) {
 	inJson.close();
 	return true;
 }
-bool CreateJson(string fileName) {
-	ofstream create(fileName);
+bool CreateJson(std::string fileName) {
+	std::ofstream create(fileName);
 	if (create.is_open()) {
 		create.close();
 		return true;
@@ -19,8 +19,8 @@ bool CreateJson(string fileName) {
 	return false;
 }
 
-bool MakeJson(string fileName) {
-	ifstream inJson(fileName, ios::binary);
+bool MakeJson(std::string fileName) {
+	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
 		return false;
@@ -29,16 +29,16 @@ bool MakeJson(string fileName) {
 	Json::Value fJson;
 	if (reader.parse(inJson, fJson)) fJson["update"] = true;
 	inJson.close();
-	ofstream outJson(fileName, ios_base::out);
+	std::ofstream outJson(fileName, std::ios_base::out);
 	outJson << fJson.toStyledString();
 	outJson.close();
 	return false;
 }
-bool MakeJson(string fileName, string item, string value) {
+bool MakeJson(std::string fileName, std::string item, std::string value) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream inJson(fileName, ios::binary);
+	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
 		return false;
@@ -46,12 +46,12 @@ bool MakeJson(string fileName, string item, string value) {
 	reader.parse(inJson, fJson);
 
 	if (item.find('/') != -1) {
-		string sLine;
-		vector<string> sItem;
-		stringstream ssItem(item);
+		std::string sLine;
+		std::vector<std::string> sItem;
+		std::stringstream ssItem(item);
 		while (getline(ssItem, sLine, '/')) sItem.push_back(sLine);
 
-		vector<Json::Value> v_tJson;
+		std::vector<Json::Value> v_tJson;
 
 		v_tJson.push_back(fJson[sItem[0]]);
 		for (int i = 1; i < sItem.size() - 1; i += 1) v_tJson.push_back(v_tJson[i - 1][sItem[i]]);
@@ -63,18 +63,18 @@ bool MakeJson(string fileName, string item, string value) {
 	}
 	else fJson[item] = value;
 
-	ofstream outJson(fileName, ios_base::out);
+	std::ofstream outJson(fileName, std::ios_base::out);
 	outJson << fJson.toStyledString();
 	outJson.close();
 
 	inJson.close();
 	return true;
 }
-bool MakeJson(string fileName, string item, bool value) {
+bool MakeJson(std::string fileName, std::string item, bool value) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream inJson(fileName, ios::binary);
+	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
 		return false;
@@ -82,12 +82,12 @@ bool MakeJson(string fileName, string item, bool value) {
 	reader.parse(inJson, fJson);
 
 	if (item.find('/') != -1) {
-		string sLine;
-		vector<string> sItem;
-		stringstream ssItem(item);
+		std::string sLine;
+		std::vector<std::string> sItem;
+		std::stringstream ssItem(item);
 		while (getline(ssItem, sLine, '/')) sItem.push_back(sLine);
 
-		vector<Json::Value> v_tJson;
+		std::vector<Json::Value> v_tJson;
 
 		v_tJson.push_back(fJson[sItem[0]]);
 		for (int i = 1; i < sItem.size() - 1; i += 1) v_tJson.push_back(v_tJson[i - 1][sItem[i]]);
@@ -99,18 +99,18 @@ bool MakeJson(string fileName, string item, bool value) {
 	}
 	else fJson[item] = value;
 
-	ofstream outJson(fileName, ios_base::out);
+	std::ofstream outJson(fileName, std::ios_base::out);
 	outJson << fJson.toStyledString();
 	outJson.close();
 
 	inJson.close();
 	return true;
 }
-bool MakeJson(string fileName, string item, int value) {
+bool MakeJson(std::string fileName, std::string item, int value) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream inJson(fileName, ios::binary);
+	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
 		return false;
@@ -118,12 +118,12 @@ bool MakeJson(string fileName, string item, int value) {
 	reader.parse(inJson, fJson);
 
 	if (item.find('/') != -1) {
-		string sLine;
-		vector<string> sItem;
-		stringstream ssItem(item);
+		std::string sLine;
+		std::vector<std::string> sItem;
+		std::stringstream ssItem(item);
 		while (getline(ssItem, sLine, '/')) sItem.push_back(sLine);
 
-		vector<Json::Value> v_tJson;
+		std::vector<Json::Value> v_tJson;
 
 		v_tJson.push_back(fJson[sItem[0]]);
 		for (int i = 1; i < sItem.size() - 1; i += 1) v_tJson.push_back(v_tJson[i - 1][sItem[i]]);
@@ -135,7 +135,7 @@ bool MakeJson(string fileName, string item, int value) {
 	}
 	else fJson[item] = value;
 
-	ofstream outJson(fileName, ios_base::out);
+	std::ofstream outJson(fileName, std::ios_base::out);
 	outJson << fJson.toStyledString();
 	outJson.close();
 
@@ -143,22 +143,22 @@ bool MakeJson(string fileName, string item, int value) {
 	return true;
 }
 
-void WriteJson(string fileName, Json::Value json) {
-	ofstream outJson(fileName, ios_base::out);
+void WriteJson(std::string fileName, Json::Value json) {
+	std::ofstream outJson(fileName, std::ios_base::out);
 	outJson.clear();
 	outJson << json.toStyledString();
 	outJson.close();
 }
 
-bool LoadJson(string fileName, string& content, string item) {
-	string sLine;
-	vector<string> sItem;
-	stringstream ssItem(item);
+bool LoadJson(std::string fileName, std::string& content, std::string item) {
+	std::string sLine;
+	std::vector<std::string> sItem;
+	std::stringstream ssItem(item);
 	
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream Json(fileName, ios::binary);
+	std::ifstream Json(fileName, std::ios::binary);
 	if (!Json.is_open()) {
 		Json.close();
 		return false;
@@ -178,15 +178,15 @@ bool LoadJson(string fileName, string& content, string item) {
 	Json.close();
 	return true;
 }
-bool LoadJson(string fileName, bool& content, string item) {
-	string sLine;
-	vector<string> sItem;
-	stringstream ssItem(item);
+bool LoadJson(std::string fileName, bool& content, std::string item) {
+	std::string sLine;
+	std::vector<std::string> sItem;
+	std::stringstream ssItem(item);
 
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream Json(fileName, ios::binary);
+	std::ifstream Json(fileName, std::ios::binary);
 	if (!Json.is_open()) {
 		Json.close();
 		return false;
@@ -206,15 +206,15 @@ bool LoadJson(string fileName, bool& content, string item) {
 	Json.close();
 	return true;
 }
-bool LoadJson(string fileName, int& content, string item) {
-	string sLine;
-	vector<string> sItem;
-	stringstream ssItem(item);
+bool LoadJson(std::string fileName, int& content, std::string item) {
+	std::string sLine;
+	std::vector<std::string> sItem;
+	std::stringstream ssItem(item);
 
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream Json(fileName, ios::binary);
+	std::ifstream Json(fileName, std::ios::binary);
 	if (!Json.is_open()) {
 		Json.close();
 		return false;
@@ -235,11 +235,11 @@ bool LoadJson(string fileName, int& content, string item) {
 	return true;
 }
 
-bool LoadJsonToValue(string filename, Json::Value& json) {
+bool LoadJsonToValue(std::string filename, Json::Value& json) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	ifstream Json(filename, ios::binary);
+	std::ifstream Json(filename, std::ios::binary);
 	if (!Json.is_open()) {
 		Json.close();
 		return false;

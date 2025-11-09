@@ -8,22 +8,21 @@
 
 #pragma comment(lib, "jsoncpp.lib")
 
-using namespace std;
 
-bool TestJson(string fileName);
-bool CreateJson(string fileName);
+bool TestJson(std::string fileName);
+bool CreateJson(std::string fileName);
 
-bool MakeJson(string fileName);
-bool MakeJson(string fileName, string item, string value);
-bool MakeJson(string fileName, string item, bool value);
-bool MakeJson(string fileName, string item, int value);
+bool MakeJson(std::string fileName);
+bool MakeJson(std::string fileName, std::string item, std::string value);
+bool MakeJson(std::string fileName, std::string item, bool value);
+bool MakeJson(std::string fileName, std::string item, int value);
 
-void WriteJson(string fileName, Json::Value json);
+void WriteJson(std::string fileName, Json::Value json);
 
-bool LoadJson(string fileName, string& content, string item);
-bool LoadJson(string fileName, bool& content, string item);
-bool LoadJson(string fileName, int& content, string item);
+bool LoadJson(std::string fileName, std::string& content, std::string item);
+bool LoadJson(std::string fileName, bool& content, std::string item);
+bool LoadJson(std::string fileName, int& content, std::string item);
 
-bool LoadJsonToValue(string filename, Json::Value& json);
+bool LoadJsonToValue(std::string filename, Json::Value& json);
 
 #endif
