@@ -1,0 +1,27 @@
+{
+    "parent": "main:easter_eggs/sneak_peek",
+    "display": {
+        "title": {
+            "text": "Another Portal",
+            "color": "light_purple",
+            "bold": true
+        },
+        "description": {
+            "text": "Find the secret portal to the Nether!",
+            "color": "white",
+            "bold": false
+        },
+        "icon": {
+            "id": "minecraft:crying_obsidian"
+         },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": true
+    },
+    "criteria": {
+        "0": {
+            "trigger": "minecraft:impossible"
+        }
+    }
+}

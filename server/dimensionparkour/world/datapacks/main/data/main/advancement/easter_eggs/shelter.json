@@ -1,0 +1,27 @@
+{
+    "parent": "main:easter_eggs/nether_wart_plantation",
+    "display": {
+        "title": {
+            "text": "Abandoned Shelter",
+            "color": "light_purple",
+            "bold": true
+        },
+        "description": {
+            "text": "They got so close...",
+            "color": "white",
+            "bold": false
+        },
+        "icon": {
+            "id": "minecraft:end_portal_frame"
+       },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": true
+    },
+    "criteria": {
+        "0": {
+            "trigger": "minecraft:impossible"
+        }
+    }
+}

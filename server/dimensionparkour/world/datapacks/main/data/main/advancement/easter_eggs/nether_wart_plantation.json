@@ -1,0 +1,27 @@
+{
+    "parent": "main:easter_eggs/nether_portal",
+    "display": {
+        "title": {
+            "text": "Nether Wart Plantation",
+            "color": "light_purple",
+            "bold": true
+        },
+        "description": {
+            "text": "Highest quality wart in the whole dimension!",
+            "color": "white",
+            "bold": false
+        },
+        "icon": {
+            "id": "minecraft:nether_wart"
+         },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": true
+    },
+    "criteria": {
+        "0": {
+            "trigger": "minecraft:impossible"
+        }
+    }
+}

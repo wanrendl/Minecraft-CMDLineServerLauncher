@@ -1,0 +1,49 @@
+{
+	"clientlist" : 
+	{
+		"grzny" : 
+		{
+			"exist" : true,
+			"path" : "./client/grzny"
+		},
+		"test1" : 
+		{
+			"exist" : true,
+			"path" : "./client/test1"
+		},
+		"test2" : 
+		{
+			"exist" : true,
+			"path" : "./client/test2"
+		},
+		"test3" : 
+		{
+			"exist" : true,
+			"path" : "./client/test3"
+		}
+	},
+	"frp" : 
+	{
+		"passkey" : "cxfvpys6d9mw750q",
+		"passkey_set" : true
+	},
+	"serverlist" : 
+	{
+		"asedafsa" : 
+		{
+			"exist" : true,
+			"path" : "./server/asedafsa"
+		},
+		"asedafsfff" : 
+		{
+			"exist" : true,
+			"path" : "./server/asedafsfff"
+		},
+		"test2" : 
+		{
+			"exist" : true,
+			"path" : "./server/test2"
+		}
+	},
+	"update" : true
+}

@@ -1,0 +1,27 @@
+{
+    "parent": "main:easter_eggs/larry",
+    "display": {
+        "title": {
+            "text": "Shortcut",
+            "color": "light_purple",
+            "bold": true
+        },
+        "description": {
+            "text": "Take the shortcut that saves you like... 5 seconds...",
+            "color": "white",
+            "bold": false
+        },
+        "icon": {
+            "id": "minecraft:ender_pearl"
+       },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": true
+    },
+    "criteria": {
+        "0": {
+            "trigger": "minecraft:impossible"
+        }
+    }
+}

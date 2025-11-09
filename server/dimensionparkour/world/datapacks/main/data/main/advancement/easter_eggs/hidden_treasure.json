@@ -1,0 +1,27 @@
+{
+    "parent": "main:easter_eggs/tree_house",
+    "display": {
+        "title": {
+            "text": "Hidden Treasure",
+            "color": "light_purple",
+            "bold": true
+        },
+        "description": {
+            "text": "Find the hidden treasure by pushing a very hard to find button",
+            "color": "white",
+            "bold": false
+        },
+        "icon": {
+            "id": "minecraft:gold_block"
+         },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": false,
+        "hidden": true
+    },
+    "criteria": {
+        "0": {
+            "trigger": "minecraft:impossible"
+        }
+    }
+}

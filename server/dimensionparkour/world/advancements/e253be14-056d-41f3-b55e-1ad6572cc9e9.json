@@ -1,0 +1,15 @@
+{
+  "main:easter_eggs/root": {
+    "criteria": {
+      "root": "2025-08-16 17:23:57 +0800"
+    },
+    "done": true
+  },
+  "time:root": {
+    "criteria": {
+      "root": "2025-08-16 17:23:57 +0800"
+    },
+    "done": true
+  },
+  "DataVersion": 4325
+}
