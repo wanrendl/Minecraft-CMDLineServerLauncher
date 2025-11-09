@@ -1,6 +1,10 @@
 #include "gjson.h"
 
-bool TestJson(std::string fileName) {
+void Profile::Initialize(std::string filename) {
+	fileName = filename;
+}
+
+bool Profile::TestJson() {
 	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
@@ -9,7 +13,7 @@ bool TestJson(std::string fileName) {
 	inJson.close();
 	return true;
 }
-bool CreateJson(std::string fileName) {
+bool Profile::CreateJson() {
 	std::ofstream create(fileName);
 	if (create.is_open()) {
 		create.close();
@@ -19,7 +23,7 @@ bool CreateJson(std::string fileName) {
 	return false;
 }
 
-bool MakeJson(std::string fileName) {
+bool Profile::MakeJson() {
 	std::ifstream inJson(fileName, std::ios::binary);
 	if (!inJson.is_open()) {
 		inJson.close();
@@ -34,7 +38,7 @@ bool MakeJson(std::string fileName) {
 	outJson.close();
 	return false;
 }
-bool MakeJson(std::string fileName, std::string item, std::string value) {
+bool Profile::MakeJson(std::string item, std::string value) {
 	Json::Reader reader;
 	Json::Value fJson;
 
@@ -70,7 +74,7 @@ bool MakeJson(std::string fileName, std::string item, std::string value) {
 	inJson.close();
 	return true;
 }
-bool MakeJson(std::string fileName, std::string item, bool value) {
+bool Profile::MakeJson(std::string item, bool value) {
 	Json::Reader reader;
 	Json::Value fJson;
 
@@ -106,7 +110,7 @@ bool MakeJson(std::string fileName, std::string item, bool value) {
 	inJson.close();
 	return true;
 }
-bool MakeJson(std::string fileName, std::string item, int value) {
+bool Profile::MakeJson(std::string item, int value) {
 	Json::Reader reader;
 	Json::Value fJson;
 
@@ -143,14 +147,14 @@ bool MakeJson(std::string fileName, std::string item, int value) {
 	return true;
 }
 
-void WriteJson(std::string fileName, Json::Value json) {
+void Profile::WriteJson(Json::Value& json) {
 	std::ofstream outJson(fileName, std::ios_base::out);
 	outJson.clear();
 	outJson << json.toStyledString();
 	outJson.close();
 }
 
-bool LoadJson(std::string fileName, std::string& content, std::string item) {
+bool Profile::LoadJson(std::string& content, std::string item) {
 	std::string sLine;
 	std::vector<std::string> sItem;
 	std::stringstream ssItem(item);
@@ -158,27 +162,27 @@ bool LoadJson(std::string fileName, std::string& content, std::string item) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	std::ifstream Json(fileName, std::ios::binary);
-	if (!Json.is_open()) {
-		Json.close();
+	std::ifstream inJson(fileName, std::ios::binary);
+	if (!inJson.is_open()) {
+		inJson.close();
 		return false;
 	}
 
 	if (item.find('/') != -1) {
 		while (getline(ssItem, sLine, '/')) sItem.push_back(sLine);
 
-		if (reader.parse(Json, fJson)) {
+		if (reader.parse(inJson, fJson)) {
 			Json::Value finalJson;
 			finalJson = fJson[sItem[0]];
 			if (sItem.size() >= 2) for (int i = 1; i < sItem.size() - 1; i += 1) finalJson = finalJson[sItem[i]];
 			content = finalJson[sItem[sItem.size() - 1]].asString();
 		}
 	}
-	else if (reader.parse(Json, fJson)) content = fJson[item].asString();
-	Json.close();
+	else if (reader.parse(inJson, fJson)) content = fJson[item].asString();
+	inJson.close();
 	return true;
 }
-bool LoadJson(std::string fileName, bool& content, std::string item) {
+bool Profile::LoadJson(bool& content, std::string item) {
 	std::string sLine;
 	std::vector<std::string> sItem;
 	std::stringstream ssItem(item);
@@ -186,27 +190,27 @@ bool LoadJson(std::string fileName, bool& content, std::string item) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	std::ifstream Json(fileName, std::ios::binary);
-	if (!Json.is_open()) {
-		Json.close();
+	std::ifstream inJson(fileName, std::ios::binary);
+	if (!inJson.is_open()) {
+		inJson.close();
 		return false;
 	}
 
 	if (item.find('/') != -1) {
 		while (getline(ssItem, sLine, '/')) sItem.push_back(sLine);
 
-		if (reader.parse(Json, fJson)) {
+		if (reader.parse(inJson, fJson)) {
 			Json::Value finalJson;
 			finalJson = fJson[sItem[0]];
 			if (sItem.size() >= 2) for (int i = 1; i < sItem.size() - 1; i += 1) finalJson = finalJson[sItem[i]];
 			content = finalJson[sItem[sItem.size() - 1]].asBool();
 		}
 	}
-	else if (reader.parse(Json, fJson)) content = fJson[item].asBool();
-	Json.close();
+	else if (reader.parse(inJson, fJson)) content = fJson[item].asBool();
+	inJson.close();
 	return true;
 }
-bool LoadJson(std::string fileName, int& content, std::string item) {
+bool Profile::LoadJson(int& content, std::string item) {
 	std::string sLine;
 	std::vector<std::string> sItem;
 	std::stringstream ssItem(item);
@@ -214,36 +218,49 @@ bool LoadJson(std::string fileName, int& content, std::string item) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	std::ifstream Json(fileName, std::ios::binary);
-	if (!Json.is_open()) {
-		Json.close();
+	std::ifstream inJson(fileName, std::ios::binary);
+	if (!inJson.is_open()) {
+		inJson.close();
 		return false;
 	}
 
 	if (item.find('/') != -1) {
 		while (getline(ssItem, sLine, '/')) sItem.push_back(sLine);
 
-		if (reader.parse(Json, fJson)) {
+		if (reader.parse(inJson, fJson)) {
 			Json::Value finalJson;
 			finalJson = fJson[sItem[0]];
 			if (sItem.size() >= 2) for (int i = 1; i < sItem.size() - 1; i += 1) finalJson = finalJson[sItem[i]];
 			content = finalJson[sItem[sItem.size() - 1]].asInt();
 		}
 	}
-	else if (reader.parse(Json, fJson)) content = fJson[item].asInt();
-	Json.close();
+	else if (reader.parse(inJson, fJson)) content = fJson[item].asInt();
+	inJson.close();
 	return true;
 }
 
-bool LoadJsonToValue(std::string filename, Json::Value& json) {
+bool Profile::LoadJsonToValue(Json::Value& json) {
 	Json::Reader reader;
 	Json::Value fJson;
 
-	std::ifstream Json(filename, std::ios::binary);
-	if (!Json.is_open()) {
-		Json.close();
+	std::ifstream inJson(fileName, std::ios::binary);
+	if (!inJson.is_open()) {
+		inJson.close();
 		return false;
 	}
-	reader.parse(Json, json);
+	reader.parse(inJson, json);
+	return true;
+}
+
+bool LoadJsonToValue(std::string fileName, Json::Value& json) {
+	Json::Reader reader;
+	Json::Value fJson;
+
+	std::ifstream inJson(fileName, std::ios::binary);
+	if (!inJson.is_open()) {
+		inJson.close();
+		return false;
+	}
+	reader.parse(inJson, json);
 	return true;
 }

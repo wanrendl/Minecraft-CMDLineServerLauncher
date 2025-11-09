@@ -148,6 +148,12 @@
     <None Include="profile.json" />
     <None Include="test.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="shu.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

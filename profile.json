@@ -19,6 +19,16 @@
 			}
 		]
 	},
-	"serverlist" : {},
+	"serverlist" : 
+	{
+		"test1" : 
+		{
+			"exist" : true,
+			"java_version" : true,
+			"path" : "./server/test1",
+			"version" : "1.21.7",
+			"version_exist" : true
+		}
+	},
 	"update" : true
 }

@@ -8,21 +8,28 @@
 
 #pragma comment(lib, "jsoncpp.lib")
 
+class Profile {
+private:
+	std::string fileName;
+public:
+	void Initialize(std::string filename);
+	bool TestJson();
+	bool CreateJson();
 
-bool TestJson(std::string fileName);
-bool CreateJson(std::string fileName);
+	bool MakeJson();
+	bool MakeJson(std::string item, std::string value);
+	bool MakeJson(std::string item, bool value);
+	bool MakeJson(std::string item, int value);
 
-bool MakeJson(std::string fileName);
-bool MakeJson(std::string fileName, std::string item, std::string value);
-bool MakeJson(std::string fileName, std::string item, bool value);
-bool MakeJson(std::string fileName, std::string item, int value);
+	void WriteJson(Json::Value& json);
 
-void WriteJson(std::string fileName, Json::Value json);
+	bool LoadJson(std::string& content, std::string item);
+	bool LoadJson(bool& content, std::string item);
+	bool LoadJson(int& content, std::string item);
 
-bool LoadJson(std::string fileName, std::string& content, std::string item);
-bool LoadJson(std::string fileName, bool& content, std::string item);
-bool LoadJson(std::string fileName, int& content, std::string item);
+	bool LoadJsonToValue(Json::Value& json);
+};
 
-bool LoadJsonToValue(std::string filename, Json::Value& json);
+bool LoadJsonToValue(std::string fileName, Json::Value& json);
 
 #endif

@@ -56,4 +56,14 @@
       <Filter>资源文件\manifests</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="shu.png">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

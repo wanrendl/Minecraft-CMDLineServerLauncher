@@ -20,7 +20,10 @@ int main() {
 	Logger logger;
 	std::stringstream LoggerLog;
 
-	std::string version = "Minecraft CMDLine Server Launcher: v20251109-214400";
+	Profile profile;
+	profile.Initialize("./profile.json");
+
+	std::string version = "Minecraft CMDLine Server Launcher: v20251109-231300";
 	LoggerLog << "Version: " << version << std::endl;
 	logger.LogINFO(LoggerLog);
 
@@ -43,14 +46,14 @@ int main() {
 
 	std::cout << std::endl;
 
-	MakeJson("profile.json");
+	profile.MakeJson();
 
-	if (!TestJson("profile.json")) CreateJson("profile.json");
+	if (!profile.TestJson()) profile.CreateJson();
 	bool isup_test;
-	LoadJson("profile.json", isup_test, "frp/passkey_set");
+	profile.LoadJson(isup_test, "frp/passkey_set");
 	if (!isup_test) {
-		MakeJson("profile.json", "frp/passkey", std::string(""));
-		MakeJson("profile.json", "frp/passkey_set", false);
+		profile.MakeJson("frp/passkey", std::string(""));
+		profile.MakeJson("frp/passkey_set", false);
 	}
 
 	std::string frp_userid;
@@ -110,20 +113,20 @@ int main() {
 								logger.LogWARN(LoggerLog);
 							}
 							else {
-								MakeJson("profile.json", "frp/passkey", frp_userid);
-								MakeJson("profile.json", "frp/passkey_set", frp_userid_set);
+								profile.MakeJson("frp/passkey", frp_userid);
+								profile.MakeJson("frp/passkey_set", frp_userid_set);
 								LoggerLog << "frp Profile Saved." << std::endl;
 								logger.LogINFO(LoggerLog);
 							}
 						}
 						else if (command[3] == "load") {
-							LoadJson("profile.json", isup_test, "frp/passkey_set");
+							profile.LoadJson(isup_test, "frp/passkey_set");
 							if (!isup_test) {
 								LoggerLog << "frp Profile Passkey Not Saved." << std::endl;
 								logger.LogWARN(LoggerLog);
 							}
 							else {
-								LoadJson("profile.json", frp_userid, "frp/passkey");
+								profile.LoadJson(frp_userid, "frp/passkey");
 								frp_userid_set = true;
 								LoggerLog << "frp Profile Loaded." << std::endl;
 								logger.LogINFO(LoggerLog);
@@ -193,9 +196,9 @@ int main() {
 										LoadJsonToValue("manifests/versions/" + version + ".json", spacific_version_manifest);
 										std::filesystem::create_directories("./server/" + selected_server);
 										gDownload(spacific_version_manifest["downloads"]["server"]["url"].asString(), selected_server_path + "/server.jar");
-										MakeJson("profile.json", "serverlist/" + selected_server + "/version", version);
-										MakeJson("profile.json", "serverlist/" + selected_server + "/version_exist", true);
-										MakeJson("profile.json", "serverlist/" + selected_server + "/java_version", "default");
+										profile.MakeJson("serverlist/" + selected_server + "/version", version);
+										profile.MakeJson("serverlist/" + selected_server + "/version_exist", true);
+										profile.MakeJson("serverlist/" + selected_server + "/java_version", "default");
 										selected_server_version = version;
 									}
 									else {
@@ -291,14 +294,14 @@ int main() {
 						bool doexist = false;
 						std::string server_create = command[2];
 
-						LoadJson("profile.json", doexist, "serverlist/" + server_create + "/exist");
+						profile.LoadJson(doexist, "serverlist/" + server_create + "/exist");
 						if (doexist) {
 							LoggerLog << "Server \"" << server_create << "\" existed." << std::endl;
 							logger.LogWARN(LoggerLog);
 						}
 						else {
-							MakeJson("profile.json", "serverlist/" + server_create + "/path", "./server/" + server_create);
-							MakeJson("profile.json", "serverlist/" + server_create + "/exist", true);
+							profile.MakeJson("serverlist/" + server_create + "/path", "./server/" + server_create);
+							profile.MakeJson("serverlist/" + server_create + "/exist", true);
 							std::filesystem::create_directories("./server/" + server_create);
 							LoggerLog << "Server: \"" << server_create << "\" created." << std::endl;
 							logger.LogINFO(LoggerLog);
@@ -312,13 +315,13 @@ int main() {
 						
 						bool doexist = false;
 						
-						LoadJson("profile.json", doexist, "serverlist/" + command[2] + "/exist");
+						profile.LoadJson(doexist, "serverlist/" + command[2] + "/exist");
 						if (doexist) {
 							do_server_selected = true;
 							selected_server = command[2];
-							LoadJson("profile.json", selected_server_path, "serverlist/" + command[2] + "/path");
-							LoadJson("profile.json", selected_server_version, "serverlist/" + command[2] + "/version");
-							LoadJson("profile.json", selected_server_java_path, "serverlist/" + command[2] + "/java_version");
+							profile.LoadJson(selected_server_path, "serverlist/" + command[2] + "/path");
+							profile.LoadJson(selected_server_version, "serverlist/" + command[2] + "/version");
+							profile.LoadJson(selected_server_java_path, "serverlist/" + command[2] + "/java_version");
 							LoggerLog << "Server: \"" << command[2] << "\" selected." << std::endl;
 							logger.LogINFO(LoggerLog);
 						}
@@ -334,7 +337,7 @@ int main() {
 					}
 					else if (command[1] == "list") {
 						Json::Value serverList;
-						LoadJsonToValue("profile.json", serverList);
+						profile.LoadJsonToValue(serverList);
 						int count = 0;
 						for (auto iterator = serverList["serverlist"].begin(); iterator != serverList["serverlist"].end(); ++iterator) {
 							count += 1;
@@ -348,15 +351,16 @@ int main() {
 							logger.LogWARN(LoggerLog);
 						}
 						else {
-							Json::Value profile;
-							LoadJsonToValue("profile.json", profile);
+							Json::Value JsonProfile;
+							profile.LoadJsonToValue(JsonProfile);
+							
 							bool dofound = false;
-							for (auto iterator = profile["serverlist"].begin(); iterator != profile["serverlist"].end(); ++iterator) {
+							for (auto iterator = JsonProfile["serverlist"].begin(); iterator != JsonProfile["serverlist"].end(); ++iterator) {
 								if (command[2] == iterator.name()) {
 									dofound = true;
-									std::filesystem::remove_all(profile["serverlist"][iterator.name()]["path"].asString());
-									profile["serverlist"].removeMember(command[2]);
-									WriteJson("profile.json", profile);
+									std::filesystem::remove_all(JsonProfile["serverlist"][iterator.name()]["path"].asString());
+									JsonProfile["serverlist"].removeMember(command[2]);
+									profile.WriteJson(JsonProfile);
 									LoggerLog << "Server Deleted." << std::endl;
 									logger.LogINFO(LoggerLog);
 									break;
@@ -372,7 +376,7 @@ int main() {
 						if (command[2] == "select" && do_server_selected && args == 4) {
 							std::string javaVersion = command[3];
 							Json::Value javaListJson;
-							LoadJsonToValue("profile.json", javaListJson);
+							profile.LoadJsonToValue(javaListJson);
 							for (int i = 0; i < javaListJson["java"]["x64"].size(); i += 1) {
 								if (javaListJson["java"]["x64"][i]["name"].asString() == command[3]) {
 									selected_server_java_path = javaListJson["java"]["x64"][i]["path"].asString();
@@ -381,7 +385,7 @@ int main() {
 									break;
 								}
 							}
-							MakeJson("profile.json", "serverlist/" + selected_server + "/java_version", selected_server_java_path);
+							profile.MakeJson("serverlist/" + selected_server + "/java_version", selected_server_java_path);
 						}
 					}
 					else if (command[1] == "make" && do_server_selected) {
@@ -407,8 +411,8 @@ int main() {
 									logger.LogWARN(LoggerLog);
 								}
 								else if (isDigitString(command[4])) {
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/maxmem", stoi(command[4]));
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/maxmemu", std::string("G"));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/maxmem", stoi(command[4]));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/maxmemu", std::string("G"));
 									LoggerLog << "Maximum Memory Set to: " << command[4] << "GB" << std::endl;
 									logger.LogINFO(LoggerLog);
 								}
@@ -423,8 +427,8 @@ int main() {
 									logger.LogWARN(LoggerLog);
 								}
 								else if (isDigitString(command[4])) {
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/minmem", stoi(command[4]));
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/minmemu", std::string("G"));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/minmem", stoi(command[4]));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/minmemu", std::string("G"));
 									LoggerLog << "Minimum Memory Set to: " << command[4] << "GB" << std::endl;
 									logger.LogINFO(LoggerLog);
 								}
@@ -436,8 +440,8 @@ int main() {
 							else if (command[3] == "maxmb" && do_server_selected) {
 								if (args <= 4) LoggerLog << "Memory?" << std::endl;
 								else if (isDigitString(command[4])) {
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/maxmem", stoi(command[4]));
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/maxmemu", std::string("M"));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/maxmem", stoi(command[4]));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/maxmemu", std::string("M"));
 									LoggerLog << "Maximum Memory Set to: " << command[4] << "MB" << std::endl;
 									logger.LogINFO(LoggerLog);
 								}
@@ -452,8 +456,8 @@ int main() {
 									logger.LogWARN(LoggerLog);
 								}
 								else if (isDigitString(command[4])) {
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/minmem", stoi(command[4]));
-									MakeJson("profile.json", "serverlist/" + selected_server + "/jvmargs/minmemu", std::string("M"));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/minmem", stoi(command[4]));
+									profile.MakeJson("serverlist/" + selected_server + "/jvmargs/minmemu", std::string("M"));
 									LoggerLog << "Minimum Memory Set to: " << command[4] << "MB" << std::endl;
 									logger.LogINFO(LoggerLog);
 								}
@@ -505,20 +509,20 @@ int main() {
 			}
 			else if (command[0] == "java") {
 				if (command[1] == "list") {
-					Json::Value profile;
-					LoadJsonToValue("profile.json", profile);
+					Json::Value JsonProfile;
+					profile.LoadJsonToValue(JsonProfile);
 
 					LoggerLog << "x64: ";
 					logger.LogINFO(LoggerLog);
-					for (int i = 0; i < profile["java"]["x64"].size(); i += 1) std::cout << profile["java"]["x64"][i]["name"].asString() << " ";
+					for (int i = 0; i < JsonProfile["java"]["x64"].size(); i += 1) std::cout << JsonProfile["java"]["x64"][i]["name"].asString() << " ";
 					std::cout << std::endl;
 
 					LoggerLog << "x86: ";
 					logger.LogINFO(LoggerLog);
-					for (int i = 0; i < profile["java"]["x86"].size(); i += 1) std::cout << profile["java"]["x86"][i]["name"].asString() << " ";
+					for (int i = 0; i < JsonProfile["java"]["x86"].size(); i += 1) std::cout << JsonProfile["java"]["x86"][i]["name"].asString() << " ";
 					std::cout << std::endl;
 					
-					profile.clear();
+					JsonProfile.clear();
 				}
 				else if (command[1] == "update") {
 					std::vector<Json::Value> javaVersion64, javaVersion32;
@@ -540,13 +544,13 @@ int main() {
 							javaVersion32.push_back(temp);
 						}
 					}
-					Json::Value profile;
-					LoadJsonToValue("profile.json", profile);
-					profile["java"].clear();
-					for (int i = 0; i < javaVersion64.size(); i += 1) profile["java"]["x64"].append(javaVersion64[i]);
-					for (int i = 0; i < javaVersion32.size(); i += 1) profile["java"]["x86"].append(javaVersion32[i]);
-					WriteJson("profile.json", profile);
-					profile.clear();
+					Json::Value JsonProfile;
+					profile.LoadJsonToValue(JsonProfile);
+					JsonProfile["java"].clear();
+					for (int i = 0; i < javaVersion64.size(); i += 1) JsonProfile["java"]["x64"].append(javaVersion64[i]);
+					for (int i = 0; i < javaVersion32.size(); i += 1) JsonProfile["java"]["x86"].append(javaVersion32[i]);
+					profile.WriteJson(JsonProfile);
+					JsonProfile.clear();
 					LoggerLog << "Java Version Updated." << std::endl;
 					logger.LogINFO(LoggerLog);
 				}

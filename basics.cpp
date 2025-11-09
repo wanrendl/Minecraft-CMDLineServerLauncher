@@ -129,19 +129,21 @@ void basicSetup(std::string path, std::string core, std::string javapath = "") {
 }
 
 void argumentSetup(std::string server, int corenum) {
+	Profile profile;
+	profile.Initialize("./profile.json");
 	std::ofstream fsArguments("./server/" + server + "/args.txt", std::ios::out | std::ios::app);
 	std::string profileRead;
 	int minmem;
 	std::string memtype;
 
-	LoadJson("profile.json", minmem, "serverlist/" + server + "/jvmargs/minmem");
+	profile.LoadJson(minmem, "serverlist/" + server + "/jvmargs/minmem");
 	fsArguments << "-Xms" << minmem;
-	LoadJson("profile.json", memtype, "serverlist/" + server + "/jvmargs/minmemu");
+	profile.LoadJson(memtype, "serverlist/" + server + "/jvmargs/minmemu");
 	fsArguments << memtype << std::endl;
 
-	LoadJson("profile.json", profileRead, "serverlist/" + server + "/jvmargs/maxmem");
+	profile.LoadJson(profileRead, "serverlist/" + server + "/jvmargs/maxmem");
 	fsArguments << "-Xmx" << profileRead;
-	LoadJson("profile.json", profileRead, "serverlist/" + server + "/jvmargs/maxmemu");
+	profile.LoadJson(profileRead, "serverlist/" + server + "/jvmargs/maxmemu");
 	fsArguments << profileRead << std::endl;
 
 	if ((minmem >= 16 && memtype == "G") || (minmem >= 16000 && memtype == "M")) fsArguments << "-XX:+UseZGC" << std::endl;
