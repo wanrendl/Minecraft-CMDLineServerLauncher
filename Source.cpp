@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <cctype>
+#include <map>
 
 std::string version_manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 std::string version_manifest_path = "manifests/version_manifest.json";
@@ -17,94 +18,7 @@ std::string selected_server, selected_server_path, selected_server_version, sele
 
 bool do_server_selected = false;
 
-//lnn(ln) sin cos tan cot atg(arctan) asn(arcsin) acs(arccos) sec csc sih(sh / sinh) coh(ch / cosh)
-std::vector<std::string> definedfunctions = { "lnn", "sin", "cos", "tan", "atg", "asn", "acs", "sec", "csc", "sih", "coh", "pow" };
-std::vector<char> operatorchar = { '+', '-', '*', '/', '(' };
-
-template<typename T>
-bool isIn(T str, std::vector<T> vec) {
-	return std::find(vec.begin(), vec.end(), str) != vec.end();
-}
-
-static bool isInt(const std::string& str) {
-	if (str.empty()) return false;
-	for (char c : str) if (!std::isdigit(c)) return false;
-	return true;
-}
-
-static int ffocnip(std::string function, char ochar) {
-	int flag = 0;
-	for (auto it = function.begin(); it != function.end(); ++it) {
-		if (*it == '(') flag += 1;
-		else if (*it == ')') flag -= 1;
-		else if (*it == ochar && flag == 0) return it - function.begin();
-	}
-	return -1;
-}
-
-static std::string toStyledFunction(char variant, std::string function) {
-	while (function.find(' ') != -1) function.erase(function.begin() + function.find(' '));
-	while (function.find(")(") != -1) function.insert(function.find(")(") + 1, "*");
-	for (auto it = function.begin(); it != function.end(); ++it) if (*it == variant && *(it - 1) != '*' && *(it - 1) != '(') function.insert(it, '*');
-	for (auto it = function.begin(); it != function.end() - 3; ++it) if (isIn(function.substr(it - function.begin(), 3), definedfunctions) && it != function.begin() && !isIn<char>(*(it - 1), operatorchar)) function.insert(it, '*');
-	return function;
-}
-
-static std::string d(char variant, std::string function) {
-	int fpos = 0;
-	if ((fpos = ffocnip(function, '+')) != -1)
-		return d(variant, function.substr(0, fpos)) + "+" + d(variant, function.substr(fpos + 1));
-	else if ((fpos = ffocnip(function, '-')) != -1)
-		return d(variant, function.substr(0, fpos)) + "-" + d(variant, function.substr(fpos + 1));
-	else if ((fpos = ffocnip(function, '*')) != -1)
-		return d(variant, function.substr(0, fpos)) + "*" + function.substr(fpos + 1)\
-			+ "+" + function.substr(0, fpos) + "*" + d(variant, function.substr(fpos + 1));
-	else if ((fpos = ffocnip(function, '/')) != -1)
-		return "(" + d(variant, function.substr(0, fpos)) + "*" + function.substr(fpos + 1)\
-			+ "-" + function.substr(0, fpos) + "*" + d(variant, function.substr(fpos + 1)) + ")"\
-			+ "/" + function.substr(fpos + 1) + "^2";
-
-	if (function[0] == '(' && function[function.length() - 1] == ')') {
-		function.erase(function.begin()), function.erase(function.end() - 1);
-		return "(" + d(variant, function) + ")";
-	}
-
-	if (function.find(variant) == -1) return "0";
-	else if (function.find(variant) != -1) {
-		if (function.length() == 1 && function[0] == variant) return "1";
-		else if (function.substr(0, 3) == "lnn")
-			return "(" + d(variant, function.substr(4, function.length() - 5)) + ")/(" + function.substr(4, function.length() - 5) + ")";
-		else if (function.substr(0, 3) == "sin")
-			return "(" + d(variant, function.substr(4, function.length() - 5)) + ")*cos(" + function.substr(4, function.length() - 5) + ")";
-		else if (function.substr(0, 3) == "cos")
-			return "(" + d(variant, function.substr(4, function.length() - 5)) + ")*(-1)*sin(" + function.substr(4, function.length() - 5) + ")";
-		else if (function.substr(0, 3) == "pow") {
-			std::string func = function.substr(function.find("pow(") + 4, function.find(',') - 4);
-			std::string time = function.substr(function.find(',') + 1, function.rfind(')') - function.find(',') - 1);
-			if (isInt(time)) {
-				if (std::stoi(time) - 1 == 1) return time + "*(" + d(variant, func) + ")*" + func;
-				else return time + "*(" + d(variant, func) + ")*pow(" + func + "," + std::to_string(std::stoi(time) - 1) + ")";
-			}
-			else return time + "*(" + d(variant, func) + ")*pow(" + func + "," + time + "-1)";
-		}
-	}
-
-	return "<" + function + '>';
-}
-
 int main() {
-	std::cout << d('x', toStyledFunction('x', "(3x+b)(2t-3)/(3x+9)")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "(2t-3)/(3x+9)")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "(2x-3)(lnn(lnn(x))+5)")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "lnn(lnn(x))")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "sin(lnn(x))")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "4pow(x, 5)")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "(3+4pow(x, 5))(2x + b)+lnn(x)")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "3pow(x, 5) + (5x + b)(3x - 2)/(6x + c) + lnn(pow(3x,2))")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "pow(3x,2)")) << std::endl;
-	std::cout << d('x', toStyledFunction('x', "lnn(pow(3x,2))")) << std::endl;
-	return 0;
-
 	Logger logger;
 	std::stringstream LoggerLog;
 
@@ -160,9 +74,9 @@ int main() {
 				if (std::cin.get() == '\n') break;
 			}
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-			
+
 			int args = command.size();
-			
+
 			//std::cout << "args: " << args << std::endl;
 
 			command[0] = fchar + command[0];
@@ -243,7 +157,7 @@ int main() {
 					std::string latest_release, latest_snapshot;
 					latest_release = version_manifest["latest"]["release"].asString();
 					latest_snapshot = version_manifest["latest"]["snapshot"].asString();
-					
+
 					LoggerLog << "Latest Release: " << latest_release << ", Latest Snapshot: " << latest_snapshot << std::endl;
 					logger.LogINFO(LoggerLog);
 
@@ -378,7 +292,7 @@ int main() {
 							LoggerLog << "ServerID?" << std::endl;
 							logger.LogWARN(LoggerLog);
 						}
-						
+
 						bool doexist = false;
 						std::string server_create = command[2];
 
@@ -400,9 +314,9 @@ int main() {
 							LoggerLog << "ServerID?" << std::endl;
 							logger.LogWARN(LoggerLog);
 						}
-						
+
 						bool doexist = false;
-						
+
 						profile.LoadJson(doexist, "serverlist/" + command[2] + "/exist");
 						if (doexist) {
 							do_server_selected = true;
@@ -441,7 +355,7 @@ int main() {
 						else {
 							Json::Value JsonProfile;
 							profile.LoadJsonToValue(JsonProfile);
-							
+
 							bool dofound = false;
 							for (auto iterator = JsonProfile["serverlist"].begin(); iterator != JsonProfile["serverlist"].end(); ++iterator) {
 								if (command[2] == iterator.name()) {
@@ -609,7 +523,7 @@ int main() {
 					logger.LogINFO(LoggerLog);
 					for (int i = 0; i < JsonProfile["java"]["x86"].size(); i += 1) std::cout << JsonProfile["java"]["x86"][i]["name"].asString() << " ";
 					std::cout << std::endl;
-					
+
 					JsonProfile.clear();
 				}
 				else if (command[1] == "update") {
